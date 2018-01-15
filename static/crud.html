@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD</title>
+</head>
+<body>
+
+<h1>Create</h1>
+<input type="text" id="create_name" placeholder="name">
+<input type="text" id="create_address" placeholder="address">
+<button onClick="createCompany()">Add a company</button>
+<div id="create_result"></div>
+
+<h1>Read</h1>
+<input type="text" id="read_id" placeholder="id">
+<button onClick="readCompany()">Read a company</button>
+<div id="read_result"></div>
+
+<h1>Update</h1>
+<input type="text" id="update_id" placeholder="id">
+<input type="text" id="update_name" placeholder="new name">
+<input type="text" id="update_address" placeholder="new address">
+<button onClick="updateCompany()">Update a company</button>
+<div id="update_result"></div>
+
+
+<h1>Delete</h1>
+<input type="text" id="delete_id" placeholder="id">
+<button onClick="deleteCompany()">Delete a company</button>
+<div id="delete_result"></div>
+
+<script>
+    function createCompany() {
+        var id = document.getElementById("create_id");
+        var name = document.getElementById("create_name");
+        var address = document.getElementById("create_address");
+        var jsonData = '{"name":' + JSON.stringify(name.value)
+            + ', "address":' + JSON.stringify(address.value) + '}';
+        var request = new XMLHttpRequest();
+        request.open("POST", "http://localhost:8000/companies/", false);
+        request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+        request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        request.send(jsonData);
+        var array = JSON.parse(request.responseText);
+        document.getElementById("create_result").innerHTML = JSON.stringify(array);
+    }
+
+    function readCompany() {
+        var id = document.getElementById("read_id");
+        var request = new XMLHttpRequest();
+        request.open("GET", "http://localhost:8000/companies/" + id.value, false);
+        request.send();
+        var array = JSON.parse(request.responseText);
+        document.getElementById("read_result").innerHTML = JSON.stringify(array);
+    }
+
+    function deleteCompany() {
+        var id = document.getElementById("delete_id");
+        var request = new XMLHttpRequest();
+        request.open("DELETE", "http://localhost:8000/companies/" + id.value + "/", false);
+        request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+        request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        request.send();
+        var array = JSON.parse(request.responseText);
+        document.getElementById("delete_result").innerHTML = JSON.stringify(array);
+    }
+
+    function updateCompany() {
+        var id = document.getElementById("update_id");
+        var name = document.getElementById("update_name");
+        var address = document.getElementById("update_address");
+        var jsonData = '{"id":' + JSON.stringify(id.value)
+            + ', "name":' + JSON.stringify(name.value)
+            + ', "address":' + JSON.stringify(address.value) + '}';
+        var request = new XMLHttpRequest();
+        request.open("PUT", "http://localhost:8000/companies/" + id.value + "/", false);
+        request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+        request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        request.send(jsonData);
+        var array = JSON.parse(request.responseText);
+        console.log(array);
+        document.getElementById("update_result").innerHTML = JSON.stringify(array);
+    }
+
+    function readCookie(name) {
+        var nameEQ = encodeURIComponent(name) + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+        }
+        return null;
+    }
+</script>
+</body>
+</html>
